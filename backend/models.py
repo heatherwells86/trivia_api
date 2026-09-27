@@ -1,35 +1,69 @@
 from sqlalchemy import Column, String, Integer
 from flask_sqlalchemy import SQLAlchemy
+import os
+
+
 database_name = 'trivia'
 database_user = 'postgres'
-database_password = 'password'
+database_password = os.environ.get('DATABASE_PASSWORD')
 database_host = 'localhost:5432'
-database_path = f'postgresql://{database_user}:{database_password}@{database_host}/{database_name}'
+
+database_path = (
+    f'postgresql://{database_user}:'
+    f'{database_password}@{database_host}/'
+    f'{database_name}'
+)
+
 
 db = SQLAlchemy()
 
-"""
-setup_db(app)
-    binds a flask application and a SQLAlchemy service
-"""
+# DATABASE SETUP
+
 def setup_db(app, database_path=database_path):
+
     app.config['SQLALCHEMY_DATABASE_URI'] = database_path
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
     db.init_app(app)
 
-"""
-Question
-"""
+# QUESTION
+
 class Question(db.Model):
+
     __tablename__ = 'questions'
 
-    id = Column(Integer, primary_key=True)
-    question = Column(String, nullable=False)
-    answer = Column(String, nullable=False)
-    category = Column(String, nullable=False)
-    difficulty = Column(Integer, nullable=False)
+    id = Column(
+        Integer,
+        primary_key=True
+    )
 
-    def __init__(self, question, answer, category, difficulty):
+    question = Column(
+        String,
+        nullable=False
+    )
+
+    answer = Column(
+        String,
+        nullable=False
+    )
+
+    category = Column(
+        String,
+        nullable=False
+    )
+
+    difficulty = Column(
+        Integer,
+        nullable=False
+    )
+
+    def __init__(
+        self,
+        question,
+        answer,
+        category,
+        difficulty
+    ):
         self.question = question
         self.answer = answer
         self.category = category
@@ -55,14 +89,21 @@ class Question(db.Model):
             'difficulty': self.difficulty
         }
 
-"""
-Category
-"""
+# CATEGORY
+
 class Category(db.Model):
+
     __tablename__ = 'categories'
 
-    id = Column(Integer, primary_key=True)
-    type = Column(String, nullable=False)
+    id = Column(
+        Integer,
+        primary_key=True
+    )
+
+    type = Column(
+        String,
+        nullable=False
+    )
 
     def __init__(self, type):
         self.type = type

@@ -1,228 +1,901 @@
-# Frontend - Trivia API
+````markdown
+# Trivia API
 
-## Getting Setup
+This project is a full-stack trivia application built with Flask, SQLAlchemy, PostgreSQL, and React.
 
-> _tip_: this frontend is designed to work with [Flask-based Backend](../backend) so it will not load successfully if the backend is not working or not connected. We recommend that you **stand up the backend first**, test using Postman or curl, update the endpoints in the frontend, and then the frontend should integrate smoothly.
+The application allows users to:
 
-### Installing Dependencies
+- View trivia categories
+- View paginated trivia questions
+- Search questions
+- Filter questions by category
+- Add new questions
+- Delete questions
+- Take quizzes using randomly selected questions
+- Prevent previously answered questions from appearing again during a quiz
 
-Recommended node version: 16x
+---
 
-1. **Installing Node and NPM**
-   This project depends on Nodejs and Node Package Manager (NPM). Before continuing, you must download and install Node (the download includes NPM) from [https://nodejs.com/en/download](https://nodejs.org/en/download/).
+# Project Dependencies
 
-2. **Installing project dependencies**
-   This project uses NPM to manage software dependencies. NPM Relies on the package.json file located in the `frontend` directory of this repository. After cloning, open your terminal and run:
+## Backend
+
+The backend uses:
+
+- Python 3
+- Flask
+- Flask-CORS
+- Flask-SQLAlchemy
+- SQLAlchemy
+- PostgreSQL
+- psycopg2
+
+## Frontend
+
+The frontend uses:
+
+- React
+- jQuery
+- npm
+
+---
+
+# Installation and Setup
+
+## 1. Clone the Project
+
+Clone the project repository and navigate into the project directory.
+
+```bash
+git clone <YOUR_REPOSITORY_URL>
+cd <YOUR_PROJECT_DIRECTORY>
+````
+
+---
+
+## 2. Create a Python Virtual Environment
+
+Create a virtual environment from the project directory:
+
+```bash
+python3 -m venv venv
+```
+
+### Windows
+
+```cmd
+venv\Scripts\activate
+```
+
+### macOS / Linux
+
+```bash
+source venv/bin/activate
+```
+
+---
+
+## 3. Install Backend Dependencies
+
+Install the required Python packages:
+
+```bash
+pip install flask flask-cors flask-sqlalchemy psycopg2-binary
+```
+
+If the project contains a `requirements.txt` file, use:
+
+```bash
+pip install -r requirements.txt
+```
+
+---
+
+# Database Setup
+
+This project uses PostgreSQL.
+
+The database configuration is located in `models.py`.
+
+The database configuration is:
+
+* Database: `trivia`
+* User: `postgres`
+* Password: stored in the `DATABASE_PASSWORD` environment variable
+* Host: `localhost`
+* Port: `5432`
+
+The PostgreSQL password is intentionally not stored directly in the source code.
+
+## Create the PostgreSQL Database
+
+Create the PostgreSQL database before starting the application:
+
+```sql
+CREATE DATABASE trivia;
+```
+
+The application creates the required tables when the Flask application starts.
+
+## Create the Test Database
+
+The automated tests use a separate PostgreSQL database named `trivia_test`.
+
+Create it before running the tests:
+
+```sql
+CREATE DATABASE trivia_test;
+```
+
+---
+
+# Configure the Database Password
+
+The application and test suite use the `DATABASE_PASSWORD` environment variable to access PostgreSQL.
+
+## Windows Command Prompt
+
+Open Command Prompt and navigate to the backend directory.
+
+For example:
+
+```cmd
+cd C:\Users\YOUR_USERNAME\trivia_api\backend
+```
+
+Set the PostgreSQL password:
+
+```cmd
+set DATABASE_PASSWORD=YOUR_POSTGRES_PASSWORD
+```
+
+Verify that the environment variable is set:
+
+```cmd
+echo %DATABASE_PASSWORD%
+```
+
+The command should display the password that was entered.
+
+The environment variable applies to the current Command Prompt window. If the window is closed, the variable must be set again in a new Command Prompt window.
+
+---
+
+# Running the Backend
+
+From the project directory, activate the virtual environment and start Flask.
+
+## Windows Command Prompt
+
+Set the database password if it has not already been configured:
+
+```cmd
+set DATABASE_PASSWORD=YOUR_POSTGRES_PASSWORD
+```
+
+Set the Flask application:
+
+```cmd
+set FLASK_APP=flaskr
+```
+
+Start the Flask development server:
+
+```cmd
+flask run
+```
+
+The Flask API will normally be available at:
+
+```text
+http://localhost:5000
+```
+
+---
+
+# Running the Frontend
+
+Open a second terminal window and navigate to the frontend directory.
+
+Install the frontend dependencies:
 
 ```bash
 npm install
 ```
 
-> _tip_: `npm i`is shorthand for `npm install``
-
-## Required Tasks
-
-### Running Your Frontend in Dev Mode
-
-The frontend app was built using create-react-app. In order to run the app in development mode use `npm start`. You can change the script in the `package.json` file.
-
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser. The page will reload if you make edits.
+Start the React development server:
 
 ```bash
 npm start
 ```
 
-### Request Formatting
+The React application will normally be available at:
 
-The frontend should be fairly straightforward and disgestible. You'll primarily work within the `components` folder in order to understand, and if you so choose edit, the endpoints utilized by the components. While working on your backend request handling and response formatting, you can reference the frontend to view how it parses the responses.
-
-After you complete your endpoints, ensure you return to the frontend to confirm your API handles requests and responses appropriately:
-
-- Endpoints defined as expected by the frontend
-- Response body provided as expected by the frontend
-
-### Optional: Updating Endpoints and API behavior
-
-Would you rather the API had different behavior - different endpoints, return the response body in a different format? Go for it! Make the updates to your API and the corresponding updates to the frontend so it works with your API seamlessly.
-
-### Optional: Styling
-
-In addition, you may want to customize and style the frontend by editing the CSS in the `stylesheets` folder.
-
-### Optional: Game Play Mechanics
-
-Currently, when a user plays the game they play up to five questions of the chosen category. If there are fewer than five questions in a category, the game will end when there are no more questions in that category.
-
-You can optionally update this game play to increase the number of questions or whatever other game mechanics you decide. Make sure to specify the new mechanics of the game in the README of the repo you submit so the reviewers are aware that the behavior is correct.
-
-> **Spoiler Alert:** If needed, there are details below regarding the expected endpoints and behavior. But, ONLY look at them if necessary. Give yourself the opportunity to practice understanding code first!
+```text
+http://localhost:3000
+```
 
 ---
 
----
+# API Documentation
 
-## DO NOT PROCEED: ENDPOINT SPOILERS
+All API responses are returned as JSON.
 
-> Only read the below to confirm your notes regarding the expected API endpoint behavior based on reading the frontend codebase.
-
-### Expected endpoints and behaviors
-
-`GET '/categories'`
-
-- Fetches a dictionary of categories in which the keys are the ids and the value is the corresponding string of the category
-- Request Arguments: None
-- Returns: An object with a single key, categories, that contains an object of id: category_string key:value pairs.
+Successful responses generally contain:
 
 ```json
 {
-  "categories": {
-    "1": "Science",
-    "2": "Art",
-    "3": "Geography",
-    "4": "History",
-    "5": "Entertainment",
-    "6": "Sports"
-  }
+    "success": true
+}
+```
+
+Error responses contain:
+
+```json
+{
+    "success": false,
+    "error": 404,
+    "message": "resource not found"
 }
 ```
 
 ---
 
-`GET '/questions?page=${integer}'`
+# GET /categories
 
-- Fetches a paginated set of questions, a total number of questions, all categories and current category string.
-- Request Arguments: `page` - integer
-- Returns: An object with 10 paginated questions, total questions, object including all categories, and current category string
+Returns all available trivia categories.
+
+## Request Parameters
+
+None.
+
+## Response Body
 
 ```json
 {
-  "questions": [
-    {
-      "id": 1,
-      "question": "This is a question",
-      "answer": "This is an answer",
-      "difficulty": 5,
-      "category": 2
+    "success": true,
+    "categories": {
+        "1": "Science",
+        "2": "Art",
+        "3": "Geography"
     }
-  ],
-  "totalQuestions": 100,
-  "categories": {
-    "1": "Science",
-    "2": "Art",
-    "3": "Geography",
-    "4": "History",
-    "5": "Entertainment",
-    "6": "Sports"
-  },
-  "currentCategory": "History"
+}
+```
+
+The category IDs are used by other endpoints when filtering questions.
+
+---
+
+# GET /questions
+
+Returns a paginated list of trivia questions.
+
+## Request Parameters
+
+| Parameter | Type    | Required | Description                                   |
+| --------- | ------- | -------- | --------------------------------------------- |
+| `page`    | integer | No       | The page number to retrieve. Defaults to `1`. |
+
+Example:
+
+```text
+GET /questions?page=1
+```
+
+## Response Body
+
+```json
+{
+    "success": true,
+    "questions": [
+        {
+            "id": 1,
+            "question": "What is the capital of France?",
+            "answer": "Paris",
+            "category": "6",
+            "difficulty": 1
+        }
+    ],
+    "total_questions": 10,
+    "categories": {
+        "1": "Science",
+        "2": "Art",
+        "6": "Geography"
+    },
+    "current_category": null
+}
+```
+
+The API returns up to 10 questions per page.
+
+If the requested page does not contain any questions, the API returns a successful response with an empty `questions` array.
+
+---
+
+# POST /questions
+
+Creates a new trivia question.
+
+## Request Parameters
+
+The request body must contain:
+
+* `question`
+* `answer`
+* `category`
+* `difficulty`
+
+## Example Request Body
+
+```json
+{
+    "question": "What is the largest planet in our solar system?",
+    "answer": "Jupiter",
+    "category": "1",
+    "difficulty": 2
+}
+```
+
+## Response Body
+
+```json
+{
+    "success": true,
+    "created": 11
+}
+```
+
+The `created` value contains the ID of the newly created question.
+
+## Error Response
+
+If the request body is missing or required fields are missing:
+
+```json
+{
+    "success": false,
+    "error": 422,
+    "message": "unprocessable"
 }
 ```
 
 ---
 
-`GET '/categories/${id}/questions'`
+# DELETE /questions/<question_id>
 
-- Fetches questions for a cateogry specified by id request argument
-- Request Arguments: `id` - integer
-- Returns: An object with questions for the specified category, total questions, and current category string
+Deletes a question using its ID.
+
+## Request Parameters
+
+The question ID is included in the URL.
+
+Example:
+
+```text
+DELETE /questions/10
+```
+
+## Response Body
 
 ```json
 {
-  "questions": [
-    {
-      "id": 1,
-      "question": "This is a question",
-      "answer": "This is an answer",
-      "difficulty": 5,
-      "category": 4
+    "success": true,
+    "deleted": 10,
+    "questions": [],
+    "total_questions": 9
+}
+```
+
+The response includes the deleted question ID and the updated question list.
+
+## Error Response
+
+If the question does not exist:
+
+```json
+{
+    "success": false,
+    "error": 404,
+    "message": "resource not found"
+}
+```
+
+---
+
+# POST /questions/search
+
+Searches the question database for questions containing the supplied search term.
+
+The search is case-insensitive.
+
+## Request Parameters
+
+The request body must contain:
+
+* `searchTerm`
+
+## Example Request Body
+
+```json
+{
+    "searchTerm": "capital"
+}
+```
+
+## Response Body
+
+```json
+{
+    "success": true,
+    "questions": [
+        {
+            "id": 1,
+            "question": "What is the capital of France?",
+            "answer": "Paris",
+            "category": "6",
+            "difficulty": 1
+        }
+    ],
+    "total_questions": 1,
+    "current_category": null,
+    "categories": {
+        "1": "Science",
+        "6": "Geography"
     }
-  ],
-  "totalQuestions": 100,
-  "currentCategory": "History"
+}
+```
+
+If the search term does not match any questions, the API returns a successful response with an empty `questions` array.
+
+```json
+{
+    "success": true,
+    "questions": [],
+    "total_questions": 0,
+    "current_category": null,
+    "categories": {
+        "1": "Science",
+        "6": "Geography"
+    }
+}
+```
+
+## Error Response
+
+If `searchTerm` is missing:
+
+```json
+{
+    "success": false,
+    "error": 422,
+    "message": "unprocessable"
 }
 ```
 
 ---
 
-`DELETE '/questions/${id}'`
+# GET /categories/<category_id>/questions
 
-- Deletes a specified question using the id of the question
-- Request Arguments: `id` - integer
-- Returns: Does not need to return anything besides the appropriate HTTP status code. Optionally can return the id of the question. If you are able to modify the frontend, you can have it remove the question using the id instead of refetching the questions.
+Returns questions belonging to a specific category.
+
+## Request Parameters
+
+The category ID is included in the URL.
+
+An optional `page` query parameter can be used for pagination.
+
+Example:
+
+```text
+GET /categories/6/questions?page=1
+```
+
+## Response Body
+
+```json
+{
+    "success": true,
+    "questions": [
+        {
+            "id": 1,
+            "question": "What is the capital of France?",
+            "answer": "Paris",
+            "category": "6",
+            "difficulty": 1
+        }
+    ],
+    "total_questions": 1,
+    "categories": {
+        "1": "Science",
+        "6": "Geography"
+    },
+    "current_category": 6
+}
+```
+
+The `current_category` value identifies the category currently being displayed.
+
+## Error Response
+
+If the category does not exist:
+
+```json
+{
+    "success": false,
+    "error": 404,
+    "message": "resource not found"
+}
+```
 
 ---
 
-`POST '/quizzes'`
+# POST /quizzes
 
-- Sends a post request in order to get the next question
-- Request Body:
+Returns a random question for a quiz.
+
+The endpoint can return questions from all categories or restrict the questions to a specific category.
+
+Questions listed in `previous_questions` are excluded from the results.
+
+## Request Parameters
+
+The request body may contain:
+
+* `previous_questions`
+* `quiz_category`
+
+## Example Request Body
 
 ```json
 {
-    'previous_questions': [1, 4, 20, 15]
-    quiz_category': 'current category'
- }
+    "previous_questions": [1, 4, 7],
+    "quiz_category": {
+        "id": 6,
+        "type": "Geography"
+    }
+}
 ```
 
-- Returns: a single new question object
+## Response Body
 
 ```json
 {
-  "question": {
+    "success": true,
+    "question": {
+        "id": 12,
+        "question": "What is the capital of Italy?",
+        "answer": "Rome",
+        "category": "6",
+        "difficulty": 1
+    }
+}
+```
+
+The returned question will not have an ID contained in `previous_questions`.
+
+---
+
+# POST /quizzes Without a Category
+
+The API can also return questions from all categories.
+
+## Example Request Body
+
+```json
+{
+    "previous_questions": [1, 2, 3],
+    "quiz_category": {
+        "id": null,
+        "type": "All"
+    }
+}
+```
+
+## Response Body
+
+```json
+{
+    "success": true,
+    "question": {
+        "id": 8,
+        "question": "What is the largest ocean?",
+        "answer": "Pacific Ocean",
+        "category": "5",
+        "difficulty": 2
+    }
+}
+```
+
+---
+
+# Quiz With No Questions Remaining
+
+If all questions matching the quiz criteria have already been used, the API returns:
+
+```json
+{
+    "success": true,
+    "question": null
+}
+```
+
+This allows the frontend to determine that there are no more available questions.
+
+## Error Response
+
+If the request body is invalid or missing:
+
+```json
+{
+    "success": false,
+    "error": 422,
+    "message": "unprocessable"
+}
+```
+
+---
+
+# Error Responses
+
+## 404 Not Found
+
+The API returns a `404` response when a requested resource does not exist.
+
+Examples include:
+
+* Requesting a question that does not exist
+* Requesting a category that does not exist
+* Requesting an unknown API route
+
+## Response Body
+
+```json
+{
+    "success": false,
+    "error": 404,
+    "message": "resource not found"
+}
+```
+
+---
+
+# 422 Unprocessable Entity
+
+The API returns a `422` response when a request is missing required information or contains invalid request data.
+
+## Response Body
+
+```json
+{
+    "success": false,
+    "error": 422,
+    "message": "unprocessable"
+}
+```
+
+---
+
+# API Endpoint Summary
+
+| Method | Endpoint                              | Description                      |
+| ------ | ------------------------------------- | -------------------------------- |
+| GET    | `/categories`                         | Returns all categories           |
+| GET    | `/questions`                          | Returns paginated questions      |
+| POST   | `/questions`                          | Creates a new question           |
+| DELETE | `/questions/<question_id>`            | Deletes a question               |
+| POST   | `/questions/search`                   | Searches questions               |
+| GET    | `/categories/<category_id>/questions` | Returns questions for a category |
+| POST   | `/quizzes`                            | Returns a random quiz question   |
+
+---
+
+# Testing
+
+The project includes automated tests for the API using Python's `unittest` framework.
+
+The tests cover:
+
+* Getting categories
+* Getting paginated questions
+* Invalid pagination
+* Deleting questions
+* Deleting nonexistent questions
+* Creating questions
+* Invalid question creation
+* Searching questions
+* Case-insensitive searches
+* Searches with no results
+* Invalid searches
+* Getting questions by category
+* Invalid categories
+* Generating quiz questions
+* Filtering quiz questions by category
+* Excluding previously selected questions
+* Handling quizzes with no remaining questions
+* Invalid quiz requests
+* 404 errors
+* 422 errors
+
+## Run the Tests
+
+Make sure the `DATABASE_PASSWORD` environment variable is set before running the tests.
+
+From Windows Command Prompt:
+
+```cmd
+set DATABASE_PASSWORD=YOUR_POSTGRES_PASSWORD
+```
+
+Then run:
+
+```cmd
+python test_flaskr.py
+```
+
+The test suite can also be run using unittest discovery:
+
+```cmd
+python -m unittest discover
+```
+
+The tests use the PostgreSQL database:
+
+```text
+trivia_test
+```
+
+---
+
+# Project Structure
+
+A typical project structure is:
+
+```text
+trivia/
+│
+├── backend/
+│   ├── flaskr/
+│   │   └── __init__.py
+│   ├── models.py
+│   └── test_flaskr.py
+│
+├── frontend/
+│   ├── src/
+│   │   ├── components/
+│   │   ├── stylesheets/
+│   │   └── ...
+│   ├── package.json
+│   └── ...
+│
+└── README.md
+```
+
+---
+
+# Frontend API Integration
+
+The React frontend communicates with the Flask API using AJAX requests.
+
+For example, searching questions uses:
+
+```javascript
+$.ajax({
+    url: `/questions/search`,
+    type: 'POST',
+    dataType: 'json',
+    contentType: 'application/json',
+    data: JSON.stringify({
+        searchTerm: searchTerm
+    })
+});
+```
+
+The search endpoint uses:
+
+```text
+/questions/search
+```
+
+rather than:
+
+```text
+/questions
+```
+
+because the Flask application defines the search operation as a separate POST endpoint.
+
+---
+
+# CORS
+
+CORS is enabled so that the React frontend can communicate with the Flask backend during development.
+
+The Flask application supports the HTTP methods required by the API, including:
+
+```text
+GET
+POST
+DELETE
+OPTIONS
+```
+
+---
+
+# Database Models
+
+## Question
+
+Each question contains:
+
+```text
+id
+question
+answer
+category
+difficulty
+```
+
+Example:
+
+```json
+{
     "id": 1,
-    "question": "This is a question",
-    "answer": "This is an answer",
-    "difficulty": 5,
-    "category": 4
-  }
+    "question": "What is the capital of France?",
+    "answer": "Paris",
+    "category": "6",
+    "difficulty": 1
+}
+```
+
+## Category
+
+Each category contains:
+
+```text
+id
+type
+```
+
+Example:
+
+```json
+{
+    "id": 6,
+    "type": "Geography"
 }
 ```
 
 ---
 
-`POST '/questions'`
+# Environment Variables
 
-- Sends a post request in order to add a new question
-- Request Body:
+The following environment variable is required for PostgreSQL authentication:
 
-```json
-{
-  "question": "Heres a new question string",
-  "answer": "Heres a new answer string",
-  "difficulty": 1,
-  "category": 3
-}
+```text
+DATABASE_PASSWORD
 ```
 
-- Returns: Does not return any new data
+The password should not be committed to the repository.
+
+On Windows Command Prompt:
+
+```cmd
+set DATABASE_PASSWORD=YOUR_POSTGRES_PASSWORD
+```
 
 ---
 
-`POST '/questions'`
+# Notes
 
-- Sends a post request in order to search for a specific question by search term
-- Request Body:
+* Questions are displayed 10 at a time.
+* Question searches are case-insensitive.
+* Quiz questions are selected randomly.
+* Previously answered quiz questions are excluded.
+* Category filtering uses the category ID stored with each question.
+* Invalid requests return a `422` response.
+* Missing resources return a `404` response.
+* PostgreSQL credentials are stored using environment variables rather than directly in the source code.
+* The automated test suite uses a separate `trivia_test` PostgreSQL database.
 
-```json
-{
-  "searchTerm": "this is the term the user is looking for"
-}
 ```
-
-- Returns: any array of questions, a number of totalQuestions that met the search term and the current category string
-
-```json
-{
-  "questions": [
-    {
-      "id": 1,
-      "question": "This is a question",
-      "answer": "This is an answer",
-      "difficulty": 5,
-      "category": 5
-    }
-  ],
-  "totalQuestions": 100,
-  "currentCategory": "Entertainment"
-}
 ```
